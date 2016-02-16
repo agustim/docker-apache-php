@@ -1,5 +1,12 @@
+#
+# CONTAINER=$(docker run -d -p 80 -p 3306 -v $(pwd)/html:/var/www/html -v $(pwd)/mysql:/var/lib/mysql docker-apache-php)
+# docker stop $CONTAINER
+#
+# Based in https://github.com/eugeneware/docker-apache-php.git
+# By Eugene Ware <eugene@noblesamurai.com>
+
 FROM ubuntu:14.04
-MAINTAINER Eugene Ware <eugene@noblesamurai.com>
+MAINTAINER Agusti Moll
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
@@ -19,11 +26,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-int
 ADD my.cnf /etc/mysql/conf.d/my.cnf
 RUN chmod 664 /etc/mysql/conf.d/my.cnf
 
+# User
+RUN useradd -b /var/www -u 1000 devel
+
 # apache config
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV APACHE_RUN_USER devel
+ENV APACHE_RUN_GROUP devel
 ENV APACHE_LOG_DIR /var/log/apache2
-RUN chown -R www-data:www-data /var/www/
+RUN chown -R devel:devel /var/www/
+RUN sed -i -e "s/APACHE_RUN_USER\s*=.*/APACHE_RUN_USER = devel/g" /etc/apache2/envvars
+RUN sed -i -e "s/APACHE_RUN_GROUP\s*=.*/APACHE_RUN_GROUP = devel/g" /etc/apache2/envvars
+
+RUN cat /etc/apache2/envvars
 
 # php config
 RUN sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" /etc/php5/apache2/php.ini
