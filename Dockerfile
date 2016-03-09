@@ -1,5 +1,5 @@
 #
-# CONTAINER=$(docker run -d -p 80 -p 3306 -v $(pwd)/html:/var/www/html -v $(pwd)/mysql:/var/lib/mysql docker-apache-php)
+# CONTAINER=$(docker run -d -p 80 -p 3306 -v $(pwd)/container/html:/var/www/html -v $(pwd)/container/mysql:/var/lib/mysql docker-apache-php)
 # docker stop $CONTAINER
 #
 # Based in https://github.com/eugeneware/docker-apache-php.git
